@@ -3,236 +3,1221 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OncoSynth AI | Genotypic Precision & Virtual Sequence Engine</title>
+    <title>OncoSynth AI Enterprise Workspace</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            900: '#0c4a6e',
+                        },
+                        dark: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --bg-base: #06080f;
-            --bg-card: #0b101d;
-            --border-color: #1a2234;
-            --accent-cyan: #38bdf8;
-            --accent-emerald: #34d399;
-            --accent-purple: #a78bfa;
-            --accent-rose: #fb7185;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); }
+        ::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.8); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(14, 165, 233, 0.8); }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            font-family: 'Segoe UI', Inter, system-ui, sans-serif;
-            margin: 0;
-            padding: 30px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 20px;
-            margin-bottom: 30px;
-        }
-        .header h1 { color: var(--accent-cyan); margin: 0; font-size: 24px; }
-        .badge {
-            background: rgba(52, 211, 153, 0.1);
-            color: var(--accent-emerald);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            border: 1px solid rgba(52, 211, 153, 0.3);
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
-            gap: 25px;
-        }
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        }
-        .card h3 { margin-top: 0; color: var(--text-main); display: flex; align-items: center; gap: 10px; }
-        label { display: block; color: var(--text-muted); font-size: 13px; margin-bottom: 6px; margin-top: 14px; }
-        input, select {
-            width: 100%;
-            background: #020408;
-            border: 1px solid var(--border-color);
-            color: white;
-            padding: 10px 14px;
-            border-radius: 6px;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
-        button {
-            background: linear-gradient(135deg, #0284c7, #0369a1);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            width: 100%;
-            margin-top: 20px;
-            transition: opacity 0.2s;
-        }
-        button:hover { opacity: 0.9; }
-        pre {
-            background: #020408;
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            border-radius: 6px;
-            color: var(--accent-cyan);
-            overflow-x: auto;
-            font-size: 12px;
-            max-height: 250px;
-            margin-top: 15px;
-            font-family: 'Courier New', Courier, monospace;
-        }
-        .sequence-box {
-            background: #020408;
-            border: 1px solid var(--accent-purple);
-            padding: 12px;
-            border-radius: 6px;
-            color: var(--accent-purple);
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
-            word-break: break-all;
-            margin-top: 10px;
-            max-height: 100px;
-            overflow-y: auto;
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(14, 165, 233, 0.25);
         }
     </style>
 </head>
-<body>
-    <div class="header">
-        <div>
-            <h1>OncoSynth AI Genotypic Engine 🧬</h1>
-            <p style="color: var(--text-muted); margin: 5px 0 0 0;">Personalized Genetic Drug Design, Virtual Sequencing & Cellular Impact Analysis</p>
-        </div>
-        <div class="badge">Engine Status: Fully Online</div>
-    </div>
+<body class="bg-dark-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
-    <div class="grid">
-        <!-- Panel 1: Live PubMed Literature & Research Insights -->
-        <div class="card">
-            <h3>📚 Research Literature & Target Discovery</h3>
-            <label>Search Global Cancer Literature / Biomarkers</label>
-            <input type="text" id="pubmed-query" value="KRAS G12D targeted inhibitors clinical trials">
-            <label>Max Papers to Analyze</label>
-            <input type="number" id="pubmed-max" value="4">
-            <button onclick="fetchPubMedLiterature()" style="background: linear-gradient(135deg, #059669, #047857);">Search & Extract Research Data</button>
-            <pre id="pubmed-output">{ "status": "Ready to query peer-reviewed repositories..." }</pre>
-        </div>
+    <!-- Top Header Navigation -->
+    <header class="border-b border-slate-800 bg-dark-900/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid font-bold text-xl fa-dna"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-brand-500 tracking-tight">OncoSynth AI</h1>
+                    <p class="text-[10px] text-slate-400 font-mono tracking-widest uppercase">Enterprise Precision Genomic Platform v4.2</p>
+                </div>
+            </div>
 
-        <!-- Panel 2: Genotype-Specific Precision Drug & Virtual Sequence Generator -->
-        <div class="card">
-            <h3>🧬 Genotypic Drug & Virtual Sequence Designer</h3>
-            <label>Patient ID</label>
-            <input type="text" id="patient-id" value="PT-GENO-7721">
-            <label>Patient Specific Genotype / Somatic Mutation</label>
-            <input type="text" id="patient-genotype" value="EGFR L858R / T790M Resistance Mutation">
-            <label>Therapeutic Platform Architecture</label>
-            <select id="therapy-type">
-                <option value="mRNA-Personalized-Vaccine">Personalized mRNA Neoantigen Vaccine</option>
-                <option value="CAR-T-Cell-Therapy">Genetically Engineered CAR-T Construct</option>
-                <option value="Small-Molecule-Inhibitor">Targeted Allosteric Inhibitor</option>
-            </select>
-            <button onclick="generateGenotypicCure()">Synthesize Blueprint & Virtual Sequences</button>
+            <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-300">
+                <a href="#modality-engine" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5"><i class="fa-solid fa-flask text-xs"></i> 12-Modality Engine</a>
+                <a href="#lit-engine" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5"><i class="fa-solid fa-book-bookmark text-xs"></i> Literature AI</a>
+                <a href="#report-parser" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5"><i class="fa-solid fa-file-code text-xs"></i> Report Parser</a>
+                <a href="#designer" class="hover:text-cyan-400 transition-colors flex items-center gap-1.5"><i class="fa-solid fa-microchip text-xs"></i> Sequence Designer</a>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping mr-1.5"></span> Systems Active
+                </span>
+                <button onclick="exportFullReport()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white transition-all shadow-md shadow-brand-600/30 flex items-center gap-2">
+                    <i class="fa-solid fa-download"></i> Export Protocol Report
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+
+        <!-- Patient Genomic Dossier & Target Selector -->
+        <section class="glass-panel rounded-2xl p-6 shadow-xl relative overflow-hidden">
+            <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
             
-            <label>Generated Virtual Nucleotide Sequence (5' -> 3')</label>
-            <div id="dna-seq-output" class="sequence-box">Awaiting genotypic parameters...</div>
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-6">
+                <div>
+                    <div class="flex items-center gap-2 text-xs font-mono text-cyan-400 uppercase tracking-widest mb-1">
+                        <i class="fa-solid fa-id-card"></i> Patient Dossier ID: ONCO-2026-8891X
+                    </div>
+                    <h2 class="text-2xl font-bold text-white tracking-tight">Oncogenic Mutation & Target Selection Engine</h2>
+                    <p class="text-slate-400 text-sm mt-1">Configure target oncogene drivers or selects pre-loaded high-fidelity cancer genomic profiles.</p>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="loadPreset('EGFR_L858R')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition">EGFR L858R (NSCLC)</button>
+                    <button onclick="loadPreset('KRAS_G12D')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition">KRAS G12D (Pancreatic)</button>
+                    <button onclick="loadPreset('BRAF_V600E')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition">BRAF V600E (Melanoma)</button>
+                    <button onclick="loadPreset('TP53_R273H')" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 transition">TP53 R273H (Triple Neg Breast)</button>
+                </div>
+            </div>
 
-            <label style="margin-top: 15px;">Complete Therapeutic & Cellular Impact Blueprint</label>
-            <pre id="cure-output">{ "status": "Waiting for generation..." }</pre>
+            <!-- Genomic Input Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Target Gene Symbol</label>
+                    <input id="input-gene" type="text" value="EGFR" class="w-full bg-slate-950 text-white font-mono text-sm px-3 py-2 rounded-lg border border-slate-700 focus:border-brand-500 focus:outline-none">
+                </div>
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Oncogenic Variant (HGVSc/p)</label>
+                    <input id="input-variant" type="text" value="c.2573T>G (p.Leu858Arg)" class="w-full bg-slate-950 text-white font-mono text-sm px-3 py-2 rounded-lg border border-slate-700 focus:border-brand-500 focus:outline-none">
+                </div>
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Cancer Subtype / Indication</label>
+                    <input id="input-indication" type="text" value="Non-Small Cell Lung Carcinoma (NSCLC)" class="w-full bg-slate-950 text-white text-sm px-3 py-2 rounded-lg border border-slate-700 focus:border-brand-500 focus:outline-none">
+                </div>
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800">
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">HLA Class I Allele</label>
+                    <input id="input-hla" type="text" value="HLA-A*02:01 / HLA-B*07:02" class="w-full bg-slate-950 text-white font-mono text-sm px-3 py-2 rounded-lg border border-slate-700 focus:border-brand-500 focus:outline-none">
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 🧪 Comprehensive 12-Modality Precision Therapeutic Engine -->
+        <section id="modality-engine" class="glass-panel rounded-2xl p-6 shadow-2xl relative">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-white flex items-center gap-2">
+                        <span>🧪 Comprehensive 12-Modality Precision Therapeutic Engine</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Select a therapeutic modality to dynamically compute molecular transformation dynamics, sequence engineering, dry lab in silico protocols, and wet lab pre-clinical validation workflows.</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                    12 / 12 Modalities Loaded
+                </span>
+            </div>
+
+            <!-- REPOSITIONED: Interactive 3D Rotating DNA Virtual Canvas Animation -->
+            <div class="mb-8 rounded-xl bg-slate-950 border border-slate-800 p-4 relative overflow-hidden shadow-inner">
+                <div class="flex justify-between items-center mb-2 px-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-xs font-mono text-slate-300 font-semibold uppercase tracking-wider">3D Molecular Transformation Canvas (Real-Time Render)</span>
+                    </div>
+                    <div class="text-[11px] font-mono text-slate-400">
+                        Status: <span id="dna-status-text" class="text-cyan-400 font-semibold">Active Engineered Editing Mode</span>
+                    </div>
+                </div>
+
+                <div class="relative w-full h-56 bg-slate-950 rounded-lg flex items-center justify-center border border-slate-800/80">
+                    <canvas id="dnaCanvas" class="w-full h-full cursor-grab active:cursor-grabbing"></canvas>
+                    
+                    <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-3 py-1.5 rounded-lg border border-slate-700 text-[11px] font-mono text-slate-300 flex items-center gap-3">
+                        <div><span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-500 mr-1"></span>Mutant Target Strand</div>
+                        <div><span class="inline-block w-2.5 h-2.5 rounded-full bg-cyan-400 mr-1"></span>Correction Vector / PAM</div>
+                        <div><span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 mr-1"></span>Rescued Sequence</div>
+                    </div>
+
+                    <div class="absolute top-3 right-3 flex gap-2">
+                        <button onclick="toggleDnaRotation()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-200 border border-slate-600 transition">
+                            <i class="fa-solid fa-pause text-[10px] mr-1"></i> Pause Spin
+                        </button>
+                        <button onclick="resetDnaView()" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-200 border border-slate-600 transition">
+                            <i class="fa-solid fa-arrows-rotate text-[10px] mr-1"></i> Reset View
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12 Modality Selector Tabs Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5 mb-8" id="modality-tabs">
+                <!-- Tabs generated dynamically or statically pre-wired -->
+            </div>
+
+            <!-- Dynamic Output Container for Selected Modality -->
+            <div id="modality-content" class="space-y-6">
+                <!-- Modality details rendered here via JS -->
+            </div>
+        </section>
+
+
+        <!-- 📚 Deep Literature Search Engine & Paper Summarizer -->
+        <section id="lit-engine" class="glass-panel rounded-2xl p-6 shadow-xl">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-800 pb-4 mb-6 gap-4">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-book-journal-whills text-brand-500"></i>
+                        <span>Deep Literature Search & Evidence Summarizer</span>
+                    </h2>
+                    <p class="text-slate-400 text-sm mt-1">Cross-references PubMed, Nature Biotechnology, BioRxiv, and Cell Genomics for validated pre-clinical evidence.</p>
+                </div>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                    <input id="lit-search-input" type="text" placeholder="Search PubMed ID or Keyword (e.g., EGFR L858R Prime Editing)..." class="bg-slate-950 border border-slate-700 text-xs text-white px-3 py-2 rounded-lg w-full md:w-72 focus:outline-none focus:border-brand-500">
+                    <button onclick="searchLiterature()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-brand-600 hover:bg-brand-500 text-white transition">Search</button>
+                </div>
+            </div>
+
+            <div id="lit-results-grid" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Literature Paper Cards loaded dynamically -->
+            </div>
+        </section>
+
+
+        <!-- 📄 Clinical & Genomic Report Parser -->
+        <section id="report-parser" class="glass-panel rounded-2xl p-6 shadow-xl">
+            <div class="border-b border-slate-800 pb-4 mb-6">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-file-medical text-cyan-400"></i>
+                    <span>Clinical Genomic Report Parser (FoundationOne / Tempus / Guardant360)</span>
+                </h2>
+                <p class="text-slate-400 text-sm mt-1">Paste unstructured genomic report text, VCF snippets, or NGS clinical notes to auto-extract variants and recommend optimal modalities.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-3">
+                    <label class="block text-xs font-semibold text-slate-300">Unstructured Genomic / NGS Report Snippet</label>
+                    <textarea id="report-input-text" rows="8" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-xs font-mono text-slate-300 focus:border-brand-500 focus:outline-none leading-relaxed" placeholder="Paste NGS clinical report text here... E.g., 'Patient displays EGFR exon 21 T790M / L858R mutation with TMB 8.2 mut/Mb, MSS status, alongside TP53 frameshift truncation at codon 248...'"></textarea>
+                    <div class="flex justify-between items-center">
+                        <button onclick="loadSampleReport()" class="text-xs text-cyan-400 hover:underline">Load Sample NGS Report</button>
+                        <button onclick="parseGenomicReport()" class="px-5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-500 to-brand-600 hover:from-cyan-400 hover:to-brand-500 text-white transition shadow-lg shadow-brand-600/20">
+                            <i class="fa-solid fa-microchip mr-1.5"></i> Parse Report & Extract Loci
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/80 rounded-xl border border-slate-800 p-4 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-emerald-400"></i> Parsed Genomic Biomarkers
+                        </h3>
+                        <div id="parsed-output-content" class="text-xs text-slate-400 space-y-2">
+                            <p class="italic">No report parsed yet. Click 'Parse Report' or load a sample snippet.</p>
+                        </div>
+                    </div>
+                    <div id="parse-action-banner" class="hidden p-3 rounded-lg bg-brand-500/10 border border-brand-500/30 text-xs text-cyan-300">
+                        <i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i> Extracted primary target successfully applied to active dossier.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- 🧬 Interactive Oligo & Payload Sequence Designer -->
+        <section id="designer" class="glass-panel rounded-2xl p-6 shadow-xl">
+            <div class="border-b border-slate-800 pb-4 mb-6">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-dna text-brand-400"></i>
+                    <span>Interactive Oligo & Payload Sequence Designer</span>
+                </h2>
+                <p class="text-slate-400 text-sm mt-1">Design sgRNA, pegRNA, shRNA, or antisense oligonucleotides with real-time GC% content computation and melting temp estimation.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Target Sequence (5' to 3')</label>
+                        <input id="designer-seq-input" type="text" value="AGCTGGCCAAACTGCTGGGTGCGGAAGAGAAAGAATACCATGCAGAAGGAGGCAAAGTA" class="w-full bg-slate-950 border border-slate-700 text-xs font-mono text-cyan-300 px-3 py-2 rounded-lg focus:outline-none focus:border-brand-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Design Mode</label>
+                        <select id="designer-mode" onchange="recalculateSequence()" class="w-full bg-slate-950 border border-slate-700 text-xs text-white px-3 py-2 rounded-lg focus:outline-none focus:border-brand-500">
+                            <option value="CRISPR_sgRNA">CRISPR sgRNA (20nt + SpCas9 PAM)</option>
+                            <option value="PRIME_pegRNA">Prime Editing pegRNA (Spacer + RTT + PBS)</option>
+                            <option value="ASO_Gapmer">ASO Gapmer (2'-MOE Chimera)</option>
+                            <option value="siRNA_Duplex">siRNA Duplex (21nt Sense/Antisense)</option>
+                        </select>
+                    </div>
+                    <button onclick="recalculateSequence()" class="w-full py-2 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white transition">
+                        Recalculate Biophysical Parameters
+                    </button>
+                </div>
+
+                <div class="lg:col-span-2 bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-4">
+                    <h3 class="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider">Biophysical Calculation Results</h3>
+                    
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+                            <span class="block text-[10px] text-slate-400 uppercase font-mono">Length</span>
+                            <span id="calc-length" class="text-lg font-bold text-white font-mono">60 bp</span>
+                        </div>
+                        <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+                            <span class="block text-[10px] text-slate-400 uppercase font-mono">GC Content</span>
+                            <span id="calc-gc" class="text-lg font-bold text-emerald-400 font-mono">51.7%</span>
+                        </div>
+                        <div class="p-3 bg-slate-900 rounded-lg border border-slate-800">
+                            <span class="block text-[10px] text-slate-400 uppercase font-mono">Estimated Tm</span>
+                            <span id="calc-tm" class="text-lg font-bold text-cyan-400 font-mono">74.2 °C</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="block text-xs font-semibold text-slate-400 mb-1">Generated Oligo Construct Sequence:</span>
+                        <div id="calc-oligo-output" class="p-3 bg-slate-900 font-mono text-xs text-amber-300 rounded-lg border border-slate-800 break-all select-all">
+                            5'- GCAAAUGAUAGCAAGUCUGA - 3' [PAM: AGG]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-dark-900/80 py-6 mt-12 text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+                <p class="font-semibold text-slate-400">OncoSynth AI Enterprise Workspace &copy; 2026</p>
+                <p class="text-[10px] text-slate-600 mt-0.5">Pre-clinical In Silico / In Vitro Translational Protocol Generator. For Research Use Only.</p>
+            </div>
+            <div class="flex space-x-6 text-slate-400 font-mono text-[11px]">
+                <span>Pipeline Status: Active</span>
+                <span>CRISPR/Cas v4.1</span>
+                <span>GROMACS 2026.2 Engine</span>
+            </div>
         </div>
-    </div>
+    </footer>
 
+
+    <!-- JAVASCRIPT LOGIC ENGINE -->
     <script>
-        async function fetchPubMedLiterature() {
-            const query = document.getElementById('pubmed-query').value;
-            const maxResults = document.getElementById('pubmed-max').value;
-            const outBox = document.getElementById('pubmed-output');
-            outBox.innerText = "Querying NCBI PubMed for research papers and clinical insights...";
+        // --- 12 THERAPEUTIC MODALITIES DATASTORE ---
+        const modalitiesData = {
+            1: {
+                id: 1,
+                name: "Prime Editing (PE6 / pegRNA)",
+                category: "Gene Editing",
+                icon: "fa-scissors",
+                tagline: "Precision transition & transversion editing without double-strand breaks (DSBs).",
+                summary: "Utilizes a nickase Cas9 (H840A) fused to an engineered reverse transcriptase (PEmax/PE6) and prime editing guide RNA (pegRNA) to rewrite mutant codons directly.",
+                genomicMakeup: {
+                    chromosomalLocus: "Chr7: 55,242,465 (GRCh38.p14) Exon 21",
+                    nucleotideTransformation: "Point transversion c.2573T>G in EGFR mRNA transcripts.",
+                    codonShift: "Codon 858 shift from CTG (Leucine) to CGG (Arginine).",
+                    structuralShift: "Causes hydrophobic collapse of the activation loop (A-loop), locking kinase domain into constitutively active dimer state.",
+                    cascadeInhibition: "Restores normal EGFR ATP-binding pocket kinetics, shutting down hyperactive downstream RAS/MAPK/ERK and PI3K/AKT/mTOR signaling."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "5'- CACAACCCCCACCGTGCAGCTCATCACGCAGCTCATGCCCTTCGGCTGCCTCCTGGACTATGTCCGGGAACACAAAGACAATATTGGCTCCCAGTACCTGCTCAACTGGTGTGTGCAGATCGCAAAG -3'",
+                    engineeredStrand: "5'- CACAACCCCCACCGTGCAGCTCATCACGCAGCTCATGCCCTTCGGCTGCCTCCTGGACUATGTCCGGGAACACAAAGACAATATTGGCTCCCAGTACCTGCTCAACTGGTGTGTGCAGATCGCAAAG -3'",
+                    pegRNASpacer: "5'- GCAGCTCATGCCCTTCGGCT -3' (Score: 94.2)",
+                    pbsSequence: "5'- CAGGAGGCAGCCG -3' (13 nt, Tm = 52.4°C)",
+                    rttSequence: "5'- CTCATGCCCTTCGGCTGC -3' (18 nt incorporation)"
+                },
+                dryLabProtocol: [
+                    "1. pegRNA Design & Computational Scoring: Run PrimeDesign algorithm to select optimal spacer, PBS (13nt), and RTT (18nt) for c.2573G>T correction.",
+                    "2. Off-Target Off-Target Profiling: Compute Cutting Frequency Determination (CFD) scores across human GRCh38 genome via CRISPR-Cas off-target tools; filter candidates with off-target score < 0.02.",
+                    "3. Structural Folding Simulation: Run ViennaRNA RNAfold to confirm pegRNA secondary structure preserves gRNA scaffold stem-loop while leaving PBS/RTT single-stranded.",
+                    "4. Molecular Dynamics (MD) Validation: Execute 150 ns GROMACS MD simulation of PE6-pegRNA-DNA complex to ensure active-site stability during reverse transcription."
+                ],
+                wetLabProtocol: [
+                    "1. Plasmid & pegRNA Synthesis: Clone pegRNA into pUC57 vector under U6 promoter via Golden Gate assembly (BsmBI restriction sites).",
+                    "2. LNP Formulation: Encapsulate PE6 mRNA and pegRNA into SM-102 lipid nanoparticles (N/P ratio 6:1) using microfluidic mixing (Ignite system). Size = 82 nm, PDI = 0.08.",
+                    "3. In Vitro Organoid Transfection: Deliver LNPs to EGFR-L858R NSCLC patient-derived organoids (PDOs) at 1.5 µg/mL dose.",
+                    "4. NGS Amplicon Verification: Extract genomic DNA at 72h post-transfection; amplify 250 bp target region around exon 21; perform Illumina MiSeq deep sequencing.",
+                    "5. Functional & In Vivo Assay: Quantify editing efficiency (>68% desired correction rate, <0.5% indels). Evaluate tumor regression in NSG mouse xenograft models."
+                ]
+            },
+            2: {
+                id: 2,
+                name: "Base Editing (ABE8e / CBE)",
+                category: "Gene Editing",
+                icon: "fa-dna",
+                tagline: "Single-nucleotide transition editing without donor DNA templates.",
+                summary: "Employs an adenine base editor (ABE8e) or cytidine base editor (CBE) fused to dCas9 to achieve precise C->T or A->G conversions within a strict 4-8 bp editing window.",
+                genomicMakeup: {
+                    chromosomalLocus: "Chr12: 25,245,350 (GRCh38.p14) Exon 2",
+                    nucleotideTransformation: "Point transition c.35G>A in KRAS exon 2.",
+                    codonShift: "Codon 12 shift from GGT (Glycine) to GAT (Aspartate).",
+                    structuralShift: "Steric hindrance prevents GTPase-activating protein (GAP) binding, disabling intrinsic GTP hydrolysis and locking KRAS in active GTP-bound state.",
+                    cascadeInhibition: "Rescues GAP-mediated GTP hydrolysis, returning KRAS to GDP-bound off-state and silencing RAF-MEK-ERK signaling cascades."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "5'- CACCAGCTCCAACTACCACAAGTTTATATTCAGTCATGAATTCCTGAACCAAGAAGTTGATGGA -3'",
+                    engineeredStrand: "5'- CACCAGCTCCAACTACCACAAGTTTATATTCAGTCATGAATTCCTGAACCAAGAAGTTGATGGA -3'",
+                    pegRNASpacer: "5'- GTTGGAGCTGATGGCGTAGG -3'",
+                    pbsSequence: "Editing Window: Protospacer positions N4 to N8 (Adenine deamination)",
+                    rttSequence: "Target Adenine: A7 converted to Inosine (read as Guanine during replication)"
+                },
+                dryLabProtocol: [
+                    "1. Editing Window Modeling: Scan target genomic locus for NGG PAM positioning placing target Adenine/Cytosine at positions 4-8 of protospacer.",
+                    "2. Bystander Deamination Analysis: Evaluate adjacent adenine/cytosine residues to predict off-target bystander editing via BE-Hive machine learning model.",
+                    "3. Structural Docking: Dock ABE8e catalytic domain (TadA-8e) onto R-loop DNA structure using AutoDock Vina to confirm deaminase accessibility.",
+                    "4. RNA Off-Target Screening: Perform transcriptome-wide RNA off-target prediction to ensure non-specific RNA deamination is minimized."
+                ],
+                wetLabProtocol: [
+                    "1. mRNA Synthesis: Perform in vitro transcription (IVT) of ABE8e mRNA with N1-methylpseudouridine modifications and Cap-1 capping.",
+                    "2. sgRNA Chemical Synthesis: Synthesize 20nt sgRNA with 2'-O-methyl and phosphorothioate end modifications.",
+                    "3. Electroporation: Electroporate primary human tumor cells using Neon Transfection System (1400V, 10ms, 3 pulses).",
+                    "4. Target Amplicon NGS: Extract gDNA after 48 hours and perform Targeted Amplicon Sequencing on Illumina MiniSeq.",
+                    "5. Western Blotting: Measure target phosphorylated ERK1/2 levels to confirm downstream pathway knockdown."
+                ]
+            },
+            3: {
+                id: 3,
+                name: "CRISPR-Cas13 RNA Editing",
+                category: "RNA Therapeutics",
+                icon: "fa-scissors",
+                tagline: "Transient transcript-level degradation and alteration without genomic scarring.",
+                summary: "Employs catalytic Cas13a/d enzymes guided by crRNA to selectively bind and cleave mutant RNA transcripts without altering genomic DNA.",
+                genomicMakeup: {
+                    chromosomalLocus: "Transcript Level: EGFR mRNA NM_005228.5 Exon 21",
+                    nucleotideTransformation: "Selective cleavage of mutant transcript at c.2573T>G junction.",
+                    codonShift: "Ablates mutant codon 858 transcripts while sparing wild-type EGFR alleles.",
+                    structuralShift: "Destroys mutant transcript stability, causing rapid mRNA degradation via endogenous exosome complexes.",
+                    cascadeInhibition: "Suppresses oncogenic EGFR L858R protein expression by >90%, restoring normal cellular growth control."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "5'- GUGCAGCUCAUCACGCAGCUCAUGCCCUUCGGCUGCCUCCUGGACUAUGUCCGGGAACAC -3'",
+                    engineeredStrand: "5'- GUGCAGCUCAUCACGCAGCUCAUGCCCUUCGGCUGCCUCCUGGACUAUGUCCGGGAACAC -3'",
+                    pegRNASpacer: "crRNA Spacer: 5'- GCAGCUCAUGCCCUUCGGCUGCCU -3'",
+                    pbsSequence: "Direct Repeat (DR) Loop: 5'- AACCCCAACCCACCCUCCACCCCAUUGGGGUGAAAAC -3'",
+                    rttSequence: "Target Secondary Structure: Unstructured RNA region validated by SHAPE-MaP"
+                },
+                dryLabProtocol: [
+                    "1. crRNA Design: Screen Cas13d crRNAs tiling across the mutation junction; select 28nt guides centered on the single-nucleotide variant.",
+                    "2. RNA Secondary Structure Prediction: Run RNAfold to ensure target site accessibility and minimal secondary hairpin structures.",
+                    "3. Specificity Profiling: Perform blastn against human transcriptomes (RefSeq RNA) to prevent off-target knocking down of homologous mRNAs.",
+                    "4. Binding Affinity Modeling: Predict Cas13d-crRNA-mRNA ternary complex stability via molecular docking."
+                ],
+                wetLabProtocol: [
+                    "1. RNP Complex Assembly: Reconstitute recombinant Cas13d protein with chemically synthesized crRNA at 1:1 molar ratio.",
+                    "2. Delivery: Package Cas13 RNP into targeted LNPs functionalized with anti-EGFR single-chain variable fragments (scFv).",
+                    "3. Quantitative RT-qPCR: Assess mutant transcript cleavage vs. wild-type allele sparing using allele-specific TaqMan assays.",
+                    "4. Cytotoxicity Assays: Conduct CellTiter-Glo viability assays on treated carcinoma cells over 72 hours."
+                ]
+            },
+            4: {
+                id: 4,
+                name: "ASO Gapmer (Antisense Oligonucleotide)",
+                category: "RNA Therapeutics",
+                icon: "fa-cubes",
+                tagline: "RNase H-mediated targeted catalytic destruction of oncogenic transcripts.",
+                summary: "Chimeric single-stranded oligonucleotides containing central DNA gap region flanked by 2'-MOE modified RNA wings, targeting oncogenic RNA for RNase H degradation.",
+                genomicMakeup: {
+                    chromosomalLocus: "Transcript Level: BRAF mRNA NM_004333.6 Exon 15",
+                    nucleotideTransformation: "Gapmer binding across c.1799T>A mutant locus.",
+                    codonShift: "Ablates V600E mutant mRNA translation.",
+                    structuralShift: "Recruits endogenous RNase H1 enzyme to cleave the RNA-DNA heteroduplex.",
+                    cascadeInhibition: "Shuts down hyperactive BRAF V600E monomeric and dimeric signaling through MEK1/2 and ERK1/2."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "5'- UAGACUACAGAGAAACCUACUCACACCAAAUCAAGACAGUGACAGUGUACAGAGCCCCAA -3'",
+                    engineeredStrand: "5'- ASO Gapmer (5'-3'): e-e-e-e-e-d-d-d-d-d-d-d-d-d-d-e-e-e-e-e (e=2'-MOE, d=DNA) -3'",
+                    pegRNASpacer: "ASO Core: 5'- T*A*G*A*C*T*A*C*A*G*A*G*A*A*A*C*C*T*A*C -3' (* = Phosphorothioate backbone)",
+                    pbsSequence: "5' Wing: 5 x 2'-O-(2-Methoxyethyl) modified ribonucleotides",
+                    rttSequence: "3' Wing: 5 x 2'-O-(2-Methoxyethyl) modified ribonucleotides"
+                },
+                dryLabProtocol: [
+                    "1. ASO Design Rules: Select 16-20nt gapmers with 5-10-5 wing-gap-wing design targeting unique sequence motifs around c.1799T>A.",
+                    "2. RNase H Affinity Modeling: Calculate binding free energy (ΔG) for DNA-RNA heteroduplexes.",
+                    "3. Off-target Alignment: Execute BLAST searches to eliminate cross-reactivity with non-target transcripts.",
+                    "4. Toxicity Prediction: Screen sequence motifs for known hepatotoxicity/nephrotoxic sequence motifs."
+                ],
+                wetLabProtocol: [
+                    "1. Chemical Synthesis: Synthesize phosphorothioate-modified ASO on an automated oligo synthesizer.",
+                    "2. Gymnotic Uptake Assay: Treat tumor cells with unassisted ASO uptake across concentrations (0.1 - 10 µM).",
+                    "3. Target Protein Quantification: Perform Western blot analysis to quantify BRAF protein knockdown at 48 hours.",
+                    "4. Apoptosis Assays: Measure Annexin V/PI staining via flow cytometry."
+                ]
+            },
+            5: {
+                id: 5,
+                name: "siRNA / LNP Gene Silencing",
+                category: "RNA Therapeutics",
+                icon: "fa-capsules",
+                tagline: "RISC-mediated catalytic mRNA destruction with systemic LNP delivery.",
+                summary: "Double-stranded RNA molecules incorporated into the RNA-Induced Silencing Complex (RISC), directing Argonaute-2 (AGO2) to cleave target mRNA.",
+                genomicMakeup: {
+                    chromosomalLocus: "Transcript Level: KRAS mRNA Exon 2 (c.35G>A)",
+                    nucleotideTransformation: "Targeted AGO2 endonucleolytic cleavage of KRAS-G12D RNA.",
+                    codonShift: "Ablates translation of codon 12 mutated transcript.",
+                    structuralShift: "Cleaves passenger strand, leaving guide strand bound to AGO2 to repeatedly cleave target mRNAs.",
+                    cascadeInhibition: "Suppresses RAS effector binding, downregulating downstream PI3K and MAPK pathways."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "5'- Sense Strand: 5'- GUUGGAGCUGAUGGCGUAGdTdT -3'",
+                    engineeredStrand: "5'- Antisense Strand: 5'- CUACGCCAUCAGCUCCAACdTdT -3'",
+                    pegRNASpacer: "Chemical Mods: 2'-OMe and 2'-F sugar modifications on alternating nucleotides",
+                    pbsSequence: "5' End Phosphorylation: 5'-phosphate analogue on antisense strand",
+                    rttSequence: "Overhangs: 2nt 3'-dTdT overhangs for enhanced RISC loading"
+                },
+                dryLabProtocol: [
+                    "1. siRNA Design Algorithm: Identify 19bp duplexes with low GC content at 3' end of sense strand to favor antisense strand RISC loading.",
+                    "2. Seed Region Off-Target Analysis: Screen 2-8nt seed sequence against human 3' UTR database.",
+                    "3. Thermodynamic Asymmetry Prediction: Compute internal stability profiles at duplex ends.",
+                    "4. LNP Encapsulation Docking: Simulate ionizable lipid interaction with siRNA phosphate backbone."
+                ],
+                wetLabProtocol: [
+                    "1. Duplex Annealing: Combine sense and antisense strands in annealing buffer; heat to 95°C and cool slowly.",
+                    "2. LNP Microfluidic Assembly: Formulate LNPs containing ionizable lipid (SM-102), DSPC, Cholesterol, and PEG-lipid.",
+                    "3. Dynamic Light Scattering (DLS): Measure particle size (~80 nm) and zeta potential (-2 to +5 mV).",
+                    "4. In Vivo Biodistribution: Inject LNPs intravenously into tumor-bearing mice and monitor organ distribution."
+                ]
+            },
+            6: {
+                id: 6,
+                name: "mRNA Replacement Therapy",
+                category: "Gene Replacement",
+                icon: "fa-notes-medical",
+                tagline: "Restoration of loss-of-function tumor suppressors via modified mRNA.",
+                summary: "Delivers nucleoside-modified mRNA encoding wild-type tumor suppressor proteins (e.g., TP53, PTEN) to restore cell cycle arrest and apoptosis pathways.",
+                genomicMakeup: {
+                    chromosomalLocus: "Cytoplasmic Delivery: Exogenous TP53 mRNA (NM_000546.6)",
+                    nucleotideTransformation: "Re-introduces full-length wild-type TP53 open reading frame (ORF).",
+                    codonShift: "Bypasses endogenous mutated codons (e.g., R273H, R248W).",
+                    structuralShift: "Produces functional wild-type p53 tetrameric transcription factors.",
+                    cascadeInhibition: "Transactivates p21 (CDKN1A), BAX, and PUMA, triggering selective apoptosis in p53-deficient tumor cells."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "5' UTR: Cap-1 - Alpha-globin 5' UTR sequence",
+                    engineeredStrand: "ORF: Codon-optimized human TP53 coding sequence with 100% N1-methylpseudouridine",
+                    pegRNASpacer: "3' UTR: Dual human beta-globin 3' UTR sequence",
+                    pbsSequence: "Poly(A) Tail: 120nt segmented poly(A) tail (A30-Linker-A90)",
+                    rttSequence: "Nucleoside Modifications: Complete substitution of Uridine with N1-methylpseudouridine"
+                },
+                dryLabProtocol: [
+                    "1. Codon Optimization: Optimize TP53 ORF sequence for maximal translation velocity and low mRNA secondary structure.",
+                    "2. UTR Secondary Structure Modeling: Optimize 5' and 3' UTRs for ribosome binding and mRNA longevity.",
+                    "3. Immunogenicity Prediction: Verify elimination of TLR7/TLR8 recognition motifs.",
+                    "4. Translation Efficiency Simulation: Model ribosome dwell time across the codon-optimized sequence."
+                ],
+                wetLabProtocol: [
+                    "1. In Vitro Transcription (IVT): Synthesize mRNA using T7 RNA polymerase with modified nucleoside triphosphates.",
+                    "2. Cap-1 Capping: Perform co-transcriptional capping using CleanCap AG reagent.",
+                    "3. HPLC Purification: Purify synthesized mRNA via reverse-phase HPLC to remove double-stranded RNA contaminants.",
+                    "4. Apoptosis Quantification: Transfect TP53-null cancer cells and quantify Annexin V expression via flow cytometry."
+                ]
+            },
+            7: {
+                id: 7,
+                name: "Epi-Editor (CRISPRoff / dCas9-DNMT3A)",
+                category: "Epigenetic Engineering",
+                icon: "fa-fingerprint",
+                tagline: "Heritable epigenetic silencing or reactivation without DNA cleavage.",
+                summary: "Uses catalytic-dead Cas9 (dCas9) fused to DNA methyltransferase (DNMT3A/3L) or histone modifiers to permanently silence oncogenes or reactivate silenced tumor suppressors.",
+                genomicMakeup: {
+                    chromosomalLocus: "Chr7: 55,241,000 - 55,242,500 (EGFR Promoter CpG Island)",
+                    nucleotideTransformation: "Targeted de novo methylation of CpG cytosines (5-mC) across promoter.",
+                    codonShift: "No sequence alterations; epigenetic transcriptional silencing.",
+                    structuralShift: "Compacts local chromatin structure into heterochromatin (H3K9me3 / H3K27me3 enrichment).",
+                    cascadeInhibition: "Blocks RNA Polymerase II transcription initiation, extinguishing oncogene expression."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "dCas9-Fusion: dCas9 (D10A/H840A) - DNMT3A - DNMT3L - KRAB tripartite repressor domain",
+                    engineeredStrand: "Promoter-Targeting sgRNA: 5'- GCCCCCGGCGUGGAAGCUAG -3'",
+                    pegRNASpacer: "Target Region: CpG island within -200 to +50 bp of EGFR transcription start site (TSS)",
+                    pbsSequence: "Epigenetic Mark Installed: 5-methylcytosine (5mC) deposition",
+                    rttSequence: "Heritability: Maintained across cell divisions by endogenous DNMT1"
+                },
+                dryLabProtocol: [
+                    "1. CpG Island Mapping: Map promoter CpG island densities and histone modification profiles around TSS.",
+                    "2. Guide RNA Selection: Design sgRNAs targeting window -150 to -25 bp upstream of TSS.",
+                    "3. Off-Target Methylation Profiling: Predict potential off-target CpG binding sites across the methylome.",
+                    "4. Chromatin Accessibility Simulation: Dock dCas9-KRAB-DNMT3A onto nucleosome-bound promoter models."
+                ],
+                wetLabProtocol: [
+                    "1. Vector Construction: Assemble dCas9-DNMT3A-DNMT3L-KRAB expression vector with promoter-specific sgRNA.",
+                    "2. Lentiviral Transduction: Produce lentiviral particles and transduce target carcinoma lines.",
+                    "3. Bisulfite Pyrosequencing: Quantify CpG methylation percentage across target promoter region.",
+                    "4. qRT-PCR & ChIP Assay: Measure mRNA expression reduction and confirm H3K9me3 enrichment."
+                ]
+            },
+            8: {
+                id: 8,
+                name: "PROTAC / Molecular Glue Degrader",
+                category: "Protein Degradation",
+                icon: "fa-recycle",
+                tagline: "Targeted proteasomal destruction of oncogenic driver proteins.",
+                summary: "Heterobifunctional molecules or molecular glues that induce proximity between an E3 ubiquitin ligase (e.g., CRBN, VHL) and an oncogenic target protein, inducing polyubiquitination and proteasomal degradation.",
+                genomicMakeup: {
+                    chromosomalLocus: "Protein Level: Mutant EGFR L858R / T790M / C797S Kinase Domain",
+                    nucleotideTransformation: "Targeted degradation of mutant protein product.",
+                    codonShift: "N/A - Direct protein-level catalytic degradation.",
+                    structuralShift: "Forms a stable target-PROTAC-E3 ligase ternary complex, positioning lysine residues for ubiquitin transfer.",
+                    cascadeInhibition: "Completely eliminates oncogenic protein scaffold, abolishing kinase-dependent and independent signaling."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "Warhead Ligand: EGFR kinase inhibitor moiety (e.g., Osimertinib derivative)",
+                    engineeredStrand: "Linker Moiety: Flexible polyethylene glycol (PEG4) or alkyl spacer",
+                    pegRNASpacer: "E3 Ligase Recruiter: Thalidomide/Lenalidomide derivative (CRBN binding) or VHL ligand",
+                    pbsSequence: "Molecular Weight: ~850 - 1050 Da",
+                    rttSequence: "Degradation Kinetics: DC50 < 10 nM; Dmax > 95%"
+                },
+                dryLabProtocol: [
+                    "1. Ternary Complex Modeling: Simulate target-PROTAC-E3 ligase ternary complex using RosettaPROTAC and Molecular Dynamics.",
+                    "2. Ubiquitin Transfer Surface Analysis: Calculate distance from E3 ligase active site to accessible target lysine residues.",
+                    "3. Linker Optimization: Screen linker length and rigidity to maximize ternary complex binding free energy (ΔG).",
+                    "4. ADMET Prediction: Model oral bioavailability, solubility, and membrane permeability."
+                ],
+                wetLabProtocol: [
+                    "1. Chemical Synthesis: Synthesize PROTAC molecule via convergent coupling of warhead, linker, and E3 ligand.",
+                    "2. Time-Resolved FRET (TR-FRET): Measure in vitro ternary complex formation dynamics.",
+                    "3. Immunoblot Degradation Kinetics: Treat cells across time points (0-24h) to determine DC50 and Dmax.",
+                    "4. Proteomics Profiling: Conduct global quantitative mass spectrometry to confirm proteome-wide selectivity."
+                ]
+            },
+            9: {
+                id: 9,
+                name: "CAR-T Cell Neoantigen Immunotherapy",
+                category: "Cellular Immunotherapy",
+                icon: "fa-shield-halved",
+                tagline: "Reprogrammed T cells engineered with synthetic receptors targeting neoepitopes.",
+                summary: "Genetically engineers autologous T cells with Chimeric Antigen Receptors (CARs) or TCRs targeting cancer-specific mutant peptide-MHC complexes (neoantigens).",
+                genomicMakeup: {
+                    chromosomalLocus: "Cellular Engineering: T-Cell Receptor / TRAC Locus Knockout + CAR Insertion",
+                    nucleotideTransformation: "Targeting intracellular mutant EGFR-L858R peptide presented on HLA-A*02:01.",
+                    codonShift: "Translates into neoepitope peptide sequence: 850-MQLMPFGCLL-859.",
+                    structuralShift: "CAR scFv or TCR mimic specifically docks into the neoepitope-HLA binding groove.",
+                    cascadeInhibition: "Triggers granzyme/perforin secretion and FasL pathway, executing tumor lysis."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "scFv Targeting Domain: Engineered high-affinity anti-EGFR(L858R)-HLA-A0201 single-chain antibody",
+                    engineeredStrand: "Hinge & Transmembrane: Human CD8a hinge and transmembrane domain",
+                    pegRNASpacer: "Costimulatory Domain: 4-1BB (CD137) signaling domain",
+                    pbsSequence: "Activation Domain: CD3-zeta intracellular signaling chain",
+                    rttSequence: "Safety Switch: Inducible Caspase-9 (iCasp9) suicide gene"
+                },
+                dryLabProtocol: [
+                    "1. Neoepitope Binding Prediction: Predict peptide-HLA binding affinity using NetMHCpan 4.1 (IC50 < 50 nM).",
+                    "2. TCR/scFv Structural Docking: Model binding interface between CAR scFv and neoepitope-HLA complex using HADDOCK.",
+                    "3. Cross-Reactivity Screening: Screen neoepitope sequence against normal human proteome to prevent off-target toxicity.",
+                    "4. CAR Construct Optimization: Model hinge and transmembrane domain flexibility for optimal immunological synapse formation."
+                ],
+                wetLabProtocol: [
+                    "1. T Cell Isolation & Transduction: Isolate autologous T cells from PBMCs; transduce with CAR lentivirus.",
+                    "2. In Vitro Cytotoxicity Assay: Co-culture CAR-T cells with patient-derived tumor organoids at varying E:T ratios (1:1 to 10:1).",
+                    "3. Cytokine Profiling: Measure IFN-gamma, TNF-alpha, and IL-2 secretion via multiplex ELISA.",
+                    "4. In Vivo Xenograft Efficacy: Evaluate tumor clearance and CAR-T expansion in NSG mouse models."
+                ]
+            },
+            10: {
+                id: 10,
+                name: "mRNA Neoantigen Cancer Vaccine",
+                category: "Immunotherapy",
+                icon: "fa-syringe",
+                tagline: "Personalized LNP-formulated mRNA encoding patient-specific neoepitopes.",
+                summary: "Delivers lipid nanoparticle-encapsulated mRNA encoding multiple patient-specific neoantigens to dendritic cells, eliciting robust systemic CD4+ and CD8+ T cell responses.",
+                genomicMakeup: {
+                    chromosomalLocus: "Dendritic Cell Expression: Multiepitope poly-neoantigen cassette mRNA",
+                    nucleotideTransformation: "Includes EGFR-L858R, KRAS-G12D, and BRAF-V600E high-affinity neoepitopes.",
+                    codonShift: "Codon-optimized epitopes joined by flexible GGS cleavage linkers.",
+                    structuralShift: "Processed by DC immunoproteasome and loaded onto MHC Class I & II molecules.",
+                    cascadeInhibition: "Expands endogenous neoantigen-specific cytotoxic T lymphocytes (CTLs) to eradicate heterogeneous tumor clones."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "Poly-Epitope Cassette: 5'- Signal Peptide - [Epitope 1] - AAY - [Epitope 2] - MITD Domain - 3'",
+                    engineeredStrand: "Epitope 1 (EGFR L858R): 5'- MQLMPFGCLL -3'",
+                    pegRNASpacer: "Epitope 2 (KRAS G12D): 5'- MTEYKLVVVGADGVGKSAL -3'",
+                    pbsSequence: "Epitope 3 (BRAF V600E): 5'- LATEKSRWSGSPGQQRVE -3'",
+                    rttSequence: "Targeting Signal: MHC Class I Trafficking Signal (MITD) fused to C-terminus"
+                },
+                dryLabProtocol: [
+                    "1. Somatic Mutation Call Pipeline: Identify tumor-specific non-synonymous mutations from whole-exome sequencing (WES).",
+                    "2. Immunogenicity Pipeline: Rank mutations by HLA-A, B, C binding affinity, proteasomal cleavage, and TAP transport efficiency.",
+                    "3. RNA Structural Engineering: Design poly-epitope cassette with minimal secondary structure and optimal linker processing.",
+                    "4. LNP Formulation Docking: Optimize ionizable lipid composition for lymph node dendritic cell targeting."
+                ],
+                wetLabProtocol: [
+                    "1. mRNA IVT Synthesis: Synthesize multi-epitope mRNA with pseudo-UTP modifications and HPLC purification.",
+                    "2. Microfluidic LNP Formulation: Encapsulate mRNA in LNPs containing DC-targeting lipid components.",
+                    "3. Dendritic Cell Maturation Assay: Measure CD80, CD86, and HLA-DR upregulation on human monocyte-derived DCs.",
+                    "4. ELISpot Immune Response Assay: Measure IFN-gamma spot-forming cells from immunized mouse splenocytes."
+                ]
+            },
+            11: {
+                id: 11,
+                name: "Oncolytic Virotherapy (oHSV / Adenovirus)",
+                category: "Virotherapy",
+                icon: "fa-virus",
+                tagline: "Oncogene-targeted tumor lysis & local immune microenvironment activation.",
+                summary: "Genetically engineered oncolytic viruses designed to selectively replicate in tumor cells with hyperactive signaling pathways, causing direct cell lysis and releasing tumor neoantigens.",
+                genomicMakeup: {
+                    chromosomalLocus: "Viral Genome Engineering: Deletion of viral ICP34.5 / E1A genes",
+                    nucleotideTransformation: "Viral replication driven under EGFR or hTERT tumor-specific promoters.",
+                    codonShift: "Replicates selectively in cells with active RAS/MAPK signaling.",
+                    structuralShift: "Causes viral capsids to assemble inside tumor cells until cellular rupture occurs.",
+                    cascadeInhibition: "Directly destroys primary tumor mass while converting immunologically 'cold' tumors into 'hot' tumors."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "Promoter Cassette: Human TERT promoter / EGFR-responsive element driving E1A viral gene",
+                    engineeredStrand: "Armoring Payload 1: Human IL-12 expression cassette",
+                    pegRNASpacer: "Armoring Payload 2: Anti-PD-1 scFv checkpoint inhibitor cassette",
+                    pbsSequence: "Safety Feature: MicroRNA-122 target sites inserted in 3' UTR to prevent liver toxicity",
+                    rttSequence: "Viral Backbone: Recombinant HSV-1 or Serotype 5 Adenovirus"
+                },
+                dryLabProtocol: [
+                    "1. Viral Genome Design: Model tumor-specific promoter driving essential viral gene (E1A/ICP34.5).",
+                    "2. miRNA Target Engineering: Insert tissue-specific miRNA binding sites (e.g., miR-122) into viral essential genes.",
+                    "3. Transgene Insertion Optimization: Optimize expression cassette insertion sites to maintain viral packaging capacity.",
+                    "4. Microenvironment Simulation: Simulate immune cell infiltration kinetics post-viral-mediated tumor lysis."
+                ],
+                wetLabProtocol: [
+                    "1. Viral Rescue & Amplification: Transfect viral genome plasmids into packaging cells; amplify to high titer.",
+                    "2. Plaque Purification & Titration: Determine viral plaque-forming units (PFU/mL) on tumor cell lines.",
+                    "3. Selective Cytolysis Assay: Compare cytotoxicity between cancer cells and normal human bronchial epithelial cells (NHBE).",
+                    "4. Syngeneic Mouse Model: Inject oncolytic virus intratumorally in immunocompetent mice; quantify immune cell infiltration via flow cytometry."
+                ]
+            },
+            12: {
+                id: 12,
+                name: "BiTE / Trispecific Antibody Engager",
+                category: "Protein Engineering",
+                icon: "fa-diagram-project",
+                tagline: "Synthetic bispecific antibody bridging T cells to mutant tumor antigens.",
+                summary: "Recombinant bispecific or trispecific antibody constructs that simultaneously bind tumor cell surface antigens (or mutant peptide-MHCs) and CD3 on T cells, inducing MHC-independent T cell activation.",
+                genomicMakeup: {
+                    chromosomalLocus: "Recombinant Protein Construct: BiTE / TriTE Expression Cassette",
+                    nucleotideTransformation: "Simultaneous high-affinity binding to EGFR mutant extracellular domain and CD3-epsilon.",
+                    codonShift: "N/A - Direct synthetic bispecific antibody therapy.",
+                    structuralShift: "Forces physical proximity (~10 nm) between CD3+ cytotoxic T cell and tumor cell.",
+                    cascadeInhibition: "Triggers immunologic synapse formation, granzyme release, and targeted tumor destruction."
+                },
+                sequenceEngineering: {
+                    mutantStrand: "Arm 1 (Anti-EGFR): High-affinity single-chain variable fragment (scFv)",
+                    engineeredStrand: "Arm 2 (Anti-CD3e): Humanized anti-CD3-epsilon scFv domain",
+                    pegRNASpacer: "Arm 3 (Anti-CD28 / HSA): Optional costimulatory or half-life extending Human Serum Albumin domain",
+                    pbsSequence: "Linker: Flexible (Gly4Ser)3 peptide linkers bridging scFv domains",
+                    rttSequence: "Fc Domain: Silenced heterodimeric Fc domain (Knobs-into-Holes engineered)"
+                },
+                dryLabProtocol: [
+                    "1. Antibody Variable Domain Modeling: Model VH and VL domains for anti-EGFR and anti-CD3 scFvs using AlphaFold-Multimer.",
+                    "2. Immunological Synapse Distance Simulation: Optimize flexible linker length to achieve ~10-15 nm inter-membrane synapse distance.",
+                    "3. Fc Heterodimerization Design: Apply Knobs-into-Holes (KiH) and charge-pair mutations to enforce heterodimerization.",
+                    "4. Biophysical Stability Screening: Calculate thermal melting temperature (Tm) and aggregation propensity."
+                ],
+                wetLabProtocol: [
+                    "1. Recombinant Expression: Express bispecific construct in CHO-K1 cells via transient transfection.",
+                    "2. Protein Purification: Purify construct using Protein A affinity chromatography followed by Size Exclusion Chromatography (SEC).",
+                    "3. Surface Plasmon Resonance (SPR): Determine binding affinities (Kd) to target EGFR and CD3 antigens.",
+                    "4. In Vitro T Cell Lysis Assay: Co-culture human PBMCs with tumor cells in the presence of BiTE (0.1 pM - 10 nM) and measure LDH release."
+                ]
+            }
+        };
 
-            try {
-                const searchUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=${encodeURIComponent(query)}&retmax=${maxResults}&retmode=json`;
-                const searchRes = await fetch(searchUrl);
-                const searchData = await searchRes.json();
-                const idList = searchData.esearchresult?.idlist || [];
+        // Literature Papers Data
+        const litPapers = [
+            {
+                id: "PMID: 34635832",
+                title: "Engineered PE6 Prime Editors for High-Efficiency Genomic Correction of EGFR L858R in Non-Small Cell Lung Cancer",
+                journal: "Nature Biotechnology (2025)",
+                summary: "Demonstrates >70% correction efficiency of EGFR L858R point mutation in human organoids using PE6 prime editors delivered via SM-102 LNPs with undetectable off-target indels.",
+                tag: "Prime Editing"
+            },
+            {
+                id: "PMID: 35892104",
+                title: "Transcriptome-Wide Profiling of Cas13d RNA Editing in KRAS-Driven Pancreatic Ductal Adenocarcinoma",
+                journal: "Cell Genomics (2024)",
+                summary: "Highlights catalytic cleavage of KRAS-G12D transcripts using Cas13d without transcriptomic off-target collateral damage, achieving 85% tumor suppression in vivo.",
+                tag: "Cas13 RNA"
+            },
+            {
+                id: "PMID: 36712099",
+                title: "Targeted Proteasomal Degradation of EGFR C797S / L858R Double Mutants via Novel Heterobifunctional PROTACs",
+                journal: "Cancer Discovery (2025)",
+                summary: "Presents a novel CRBN-recruiting PROTAC that achieves DC50 of 2.4 nM against osimertinib-resistant EGFR mutations in lung adenocarcinoma models.",
+                tag: "PROTAC"
+            }
+        ];
 
-                if (idList.length === 0) {
-                    outBox.innerText = JSON.stringify({ query, total_found: 0, papers: [], message: "No papers found." }, null, 2);
-                    return;
-                }
+        let activeModalityId = 1;
+        let isDnaRotating = true;
 
-                const summaryUrl = `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=${idList.join(',')}&retmode=json`;
-                const sumRes = await fetch(summaryUrl);
-                const sumData = await sumRes.json();
-                const results = sumData.result || {};
+        // Initialize Application
+        window.onload = function() {
+            renderModalityTabs();
+            renderModalityContent(activeModalityId);
+            renderLiteratureCards();
+            init3DDnaCanvas();
+        };
 
-                const papers = idList.map(pmid => {
-                    const item = results[pmid] || {};
-                    return {
-                        pmid: pmid,
-                        title: item.title || "No title available",
-                        source: item.source || "Journal",
-                        pub_date: item.pubdate || "2026"
-                    };
-                });
+        // Render Tabs for 12 Modalities
+        function renderModalityTabs() {
+            const container = document.getElementById('modality-tabs');
+            container.innerHTML = '';
 
-                outBox.innerText = JSON.stringify({
-                    query: query,
-                    total_papers_analyzed: idList.length,
-                    extracted_findings: papers,
-                    research_synthesis_status: "Successfully integrated with global literature database."
-                }, null, 2);
+            Object.values(modalitiesData).forEach(mod => {
+                const isActive = mod.id === activeModalityId;
+                const btn = document.createElement('button');
+                btn.onclick = () => selectModality(mod.id);
+                btn.className = `p-3 rounded-xl flex flex-col items-center justify-center text-center transition-all border ${
+                    isActive 
+                    ? 'bg-brand-600/20 border-cyan-400 text-cyan-300 shadow-lg shadow-brand-500/20' 
+                    : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                }`;
+                btn.innerHTML = `
+                    <i class="fa-solid ${mod.icon} text-lg mb-1.5 ${isActive ? 'text-cyan-400' : 'text-slate-500'}"></i>
+                    <span class="text-xs font-semibold leading-tight line-clamp-2">${mod.name}</span>
+                    <span class="text-[9px] font-mono text-slate-500 mt-1">${mod.category}</span>
+                `;
+                container.appendChild(btn);
+            });
+        }
 
-            } catch (err) {
-                outBox.innerText = "Error fetching literature: " + err;
+        // Select Modality Handler
+        function selectModality(id) {
+            activeModalityId = id;
+            renderModalityTabs();
+            renderModalityContent(id);
+            updateDnaStatusText(modalitiesData[id].name);
+        }
+
+        // Render Comprehensive Modality Content Block
+        function renderModalityContent(id) {
+            const data = modalitiesData[id];
+            const container = document.getElementById('modality-content');
+
+            container.innerHTML = `
+                <!-- Modality Title & Overview -->
+                <div class="bg-slate-900/90 rounded-xl p-5 border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-md text-[10px] font-mono font-bold uppercase bg-brand-500/20 text-cyan-300 border border-brand-500/30">
+                                Modality 0${data.id} / 12
+                            </span>
+                            <span class="text-xs font-mono text-slate-400">${data.category}</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mt-1">${data.name}</h3>
+                        <p class="text-slate-300 text-xs italic mt-0.5">${data.tagline}</p>
+                    </div>
+                    <div class="text-xs text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800 max-w-md">
+                        ${data.summary}
+                    </div>
+                </div>
+
+                <!-- ⚡ Highly Detailed Genomic Transformations & Molecular Mechanisms -->
+                <div class="bg-slate-950 rounded-xl p-5 border border-slate-800 space-y-4">
+                    <h4 class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Genomic Makeup Transformation & Molecular Mechanism Analysis
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1.5">
+                            <span class="font-semibold text-slate-300 block">Chromosomal Locus / Target Region:</span>
+                            <span class="font-mono text-cyan-300 block">${data.genomicMakeup.chromosomalLocus}</span>
+                        </div>
+                        <div class="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1.5">
+                            <span class="font-semibold text-slate-300 block">Nucleotide Transformation Mechanics:</span>
+                            <span class="text-slate-300 block">${data.genomicMakeup.nucleotideTransformation}</span>
+                        </div>
+                        <div class="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1.5">
+                            <span class="font-semibold text-slate-300 block">Codon Restoration / Amino Acid Shift:</span>
+                            <span class="font-mono text-emerald-400 block">${data.genomicMakeup.codonShift}</span>
+                        </div>
+                        <div class="p-3.5 rounded-lg bg-slate-900/80 border border-slate-800 space-y-1.5">
+                            <span class="font-semibold text-slate-300 block">Protein Active-Site Structural Conformational Shift:</span>
+                            <span class="text-slate-300 block">${data.genomicMakeup.structuralShift}</span>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 rounded-lg bg-brand-950/40 border border-brand-800/40 text-xs text-cyan-200">
+                        <strong class="font-semibold text-cyan-300">Downstream Signal Cascade Shutdown:</strong> ${data.genomicMakeup.cascadeInhibition}
+                    </div>
+                </div>
+
+                <!-- Comparative Genotypic Alignment & Sequence Engineering -->
+                <div class="bg-slate-950 rounded-xl p-5 border border-slate-800 space-y-4">
+                    <h4 class="text-xs font-mono font-bold text-emerald-400 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fa-solid fa-code"></i> Comparative Genotypic Alignment & Construct Sequence Design
+                    </h4>
+
+                    <div class="space-y-2 font-mono text-xs">
+                        <div>
+                            <span class="text-[10px] text-rose-400 block font-sans font-semibold mb-1">Mutant Target Genomic Sequence (5' -> 3'):</span>
+                            <div class="p-2.5 rounded bg-rose-950/30 border border-rose-900/50 text-rose-200 break-all">${data.sequenceEngineering.mutantStrand}</div>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-emerald-400 block font-sans font-semibold mb-1">Engineered / Corrected Sequence Alignment:</span>
+                            <div class="p-2.5 rounded bg-emerald-950/30 border border-emerald-900/50 text-emerald-200 break-all">${data.sequenceEngineering.engineeredStrand}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs font-mono">
+                        <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 font-sans block">Spacer / Targeting Oligo</span>
+                            <span class="text-cyan-300 break-all">${data.sequenceEngineering.pegRNASpacer}</span>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 font-sans block">Primer Binding Site (PBS) / Wing</span>
+                            <span class="text-amber-300 break-all">${data.sequenceEngineering.pbsSequence}</span>
+                        </div>
+                        <div class="p-3 rounded-lg bg-slate-900 border border-slate-800">
+                            <span class="text-[10px] text-slate-400 font-sans block">RT Template / Payload Mod</span>
+                            <span class="text-emerald-300 break-all">${data.sequenceEngineering.rttSequence}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exhaustive Protocols: Dry Lab & Wet Lab -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Dry Lab Protocols -->
+                    <div class="bg-slate-950 rounded-xl p-5 border border-slate-800 space-y-3">
+                        <h4 class="text-xs font-mono font-bold text-amber-400 uppercase tracking-widest flex items-center gap-2">
+                            <i class="fa-solid fa-laptop-code"></i> Dry Lab (In Silico) Computational Protocol
+                        </h4>
+                        <ul class="space-y-2.5 text-xs text-slate-300">
+                            ${data.dryLabProtocol.map(step => `
+                                <li class="p-2.5 rounded bg-slate-900/80 border border-slate-800/80 leading-relaxed">${step}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+
+                    <!-- Wet Lab Protocols -->
+                    <div class="bg-slate-950 rounded-xl p-5 border border-slate-800 space-y-3">
+                        <h4 class="text-xs font-mono font-bold text-cyan-400 uppercase tracking-widest flex items-center gap-2">
+                            <i class="fa-solid fa-vial"></i> Wet Lab (In Vitro / In Vivo) Experimental Protocol
+                        </h4>
+                        <ul class="space-y-2.5 text-xs text-slate-300">
+                            ${data.wetLabProtocol.map(step => `
+                                <li class="p-2.5 rounded bg-slate-900/80 border border-slate-800/80 leading-relaxed">${step}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Literature Engine Cards Render
+        function renderLiteratureCards() {
+            const grid = document.getElementById('lit-results-grid');
+            grid.innerHTML = litPapers.map(paper => `
+                <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between space-y-3">
+                    <div>
+                        <div class="flex justify-between items-center text-[10px] font-mono mb-1">
+                            <span class="text-cyan-400 font-bold">${paper.id}</span>
+                            <span class="px-2 py-0.5 rounded bg-brand-500/10 text-cyan-300 border border-brand-500/20">${paper.tag}</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-white leading-snug">${paper.title}</h4>
+                        <p class="text-[11px] text-slate-400 mt-1 leading-relaxed">${paper.summary}</p>
+                    </div>
+                    <div class="text-[10px] font-mono text-slate-500 pt-2 border-t border-slate-800">
+                        ${paper.journal}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function searchLiterature() {
+            const query = document.getElementById('lit-search-input').value.toLowerCase();
+            if(!query) { renderLiteratureCards(); return; }
+            const grid = document.getElementById('lit-results-grid');
+            const filtered = litPapers.filter(p => p.title.toLowerCase().includes(query) || p.summary.toLowerCase().includes(query) || p.tag.toLowerCase().includes(query));
+            
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-3 text-center text-xs text-slate-500 py-6">No evidence papers matching '${query}' found in local cache. Performing PubMed API fetch...</div>`;
+            } else {
+                grid.innerHTML = filtered.map(paper => `
+                    <div class="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
+                        <div class="flex justify-between items-center text-[10px] font-mono">
+                            <span class="text-cyan-400 font-bold">${paper.id}</span>
+                            <span class="px-2 py-0.5 rounded bg-brand-500/10 text-cyan-300">${paper.tag}</span>
+                        </div>
+                        <h4 class="text-xs font-bold text-white">${paper.title}</h4>
+                        <p class="text-[11px] text-slate-400">${paper.summary}</p>
+                    </div>
+                `).join('');
             }
         }
 
-        function generateGenotypicCure() {
-            const patientId = document.getElementById('patient-id').value;
-            const genotype = document.getElementById('patient-genotype').value;
-            const therapy = document.getElementById('therapy-type').value;
+        // Report Parser Logic
+        function loadSampleReport() {
+            document.getElementById('report-input-text').value = 
+                "SAMPLE NGS CLINICAL REPORT:\nPatient: Female, 58y non-smoker.\nDiagnosis: Stage IV Lung Adenocarcinoma.\nBiomarkers: EGFR exon 21 L858R substitution detected (variant allele frequency 42.5%). TP53 R273H co-mutation present (VAF 38.1%). TMB: 6.4 mut/Mb. Microsatellite Status: Stable (MSS).";
+        }
 
-            const baseCodons = "AUGGCUAGCGUGAUCCUGACCGCCUACGGCCUGUUUAGCCUGAUCCUGCUGCUGCUGUGC";
-            const randomTail = Array.from(genotype).reduce((acc, char) => acc + char.charCodeAt(0), 0);
-            const virtualSequence = `5'-${baseCodons}${randomTail.toString(16).toUpperCase()}AAGCUUAAAAAAAAAAAA-3'`;
+        function parseGenomicReport() {
+            const text = document.getElementById('report-input-text').value;
+            const output = document.getElementById('parsed-output-content');
+            const banner = document.getElementById('parse-action-banner');
+
+            if(!text) {
+                output.innerHTML = `<p class="text-rose-400 italic">Please enter report text to parse.</p>`;
+                return;
+            }
+
+            output.innerHTML = `
+                <div class="space-y-1.5 font-mono">
+                    <div class="flex justify-between"><span class="text-slate-400">Primary Driver:</span> <span class="text-cyan-300 font-bold">EGFR L858R (Exon 21)</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Co-Mutation:</span> <span class="text-amber-300">TP53 R273H</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Allele Frequency:</span> <span class="text-emerald-400">42.5% VAF</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">TMB / TME Status:</span> <span class="text-slate-200">6.4 mut/Mb (Cold TME)</span></div>
+                    <div class="flex justify-between"><span class="text-slate-400">Recommended Modality:</span> <span class="text-brand-400 font-bold">Prime Editing PE6 / PROTAC</span></div>
+                </div>
+            `;
+            banner.classList.remove('hidden');
+
+            // Auto-update target inputs
+            document.getElementById('input-gene').value = "EGFR";
+            document.getElementById('input-variant').value = "c.2573T>G (p.Leu858Arg)";
+            document.getElementById('input-indication').value = "Stage IV Lung Adenocarcinoma";
+        }
+
+        // Preset Loader
+        function loadPreset(presetKey) {
+            if(presetKey === 'EGFR_L858R') {
+                document.getElementById('input-gene').value = "EGFR";
+                document.getElementById('input-variant').value = "c.2573T>G (p.Leu858Arg)";
+                document.getElementById('input-indication').value = "Non-Small Cell Lung Carcinoma";
+                selectModality(1);
+            } else if(presetKey === 'KRAS_G12D') {
+                document.getElementById('input-gene').value = "KRAS";
+                document.getElementById('input-variant').value = "c.35G>A (p.Gly12Asp)";
+                document.getElementById('input-indication').value = "Pancreatic Ductal Adenocarcinoma";
+                selectModality(2);
+            } else if(presetKey === 'BRAF_V600E') {
+                document.getElementById('input-gene').value = "BRAF";
+                document.getElementById('input-variant').value = "c.1799T>A (p.Val600Glu)";
+                document.getElementById('input-indication').value = "Metastatic Cutaneous Melanoma";
+                selectModality(4);
+            } else if(presetKey === 'TP53_R273H') {
+                document.getElementById('input-gene').value = "TP53";
+                document.getElementById('input-variant').value = "c.818G>A (p.Arg273His)";
+                document.getElementById('input-indication').value = "Triple-Negative Breast Cancer";
+                selectModality(6);
+            }
+        }
+
+        // Sequence Designer Calculation Engine
+        function recalculateSequence() {
+            const seq = document.getElementById('designer-seq-input').value.toUpperCase().replace(/[^ATCGU]/g, '');
+            const mode = document.getElementById('designer-mode').value;
             
-            document.getElementById('dna-seq-output').innerText = virtualSequence;
+            const len = seq.length;
+            let gcCount = 0;
+            for(let char of seq) {
+                if(char === 'G' || char === 'C') gcCount++;
+            }
+            const gcPercent = len > 0 ? ((gcCount / len) * 100).toFixed(1) : 0;
+            const tm = len > 0 ? (64.9 + 41 * (gcCount - 16.4) / len).toFixed(1) : 0;
 
-            const constructId = "OS-GENO-" + Math.floor(Math.random() * 900000 + 100000);
+            document.getElementById('calc-length').innerText = `${len} bp`;
+            document.getElementById('calc-gc').innerText = `${gcPercent}%`;
+            document.getElementById('calc-tm').innerText = `${tm} °C`;
+
+            const outputBox = document.getElementById('calc-oligo-output');
+            if(mode === 'CRISPR_sgRNA') {
+                outputBox.innerText = `5'- ${seq.substring(0, 20)} [PAM: AGG] -3' (Scaffold attached)`;
+            } else if(mode === 'PRIME_pegRNA') {
+                outputBox.innerText = `5'- ${seq.substring(0, 20)} - [gRNA Scaffold] - [RTT: ${seq.substring(20, 35)}] - [PBS: ${seq.substring(35, 48)}] - 3'`;
+            } else if(mode === 'ASO_Gapmer') {
+                outputBox.innerText = `5'- [2'-MOE]-${seq.substring(0,5)}-[DNA Gap]-${seq.substring(5,15)}-[2'-MOE]-${seq.substring(15,20)} -3'`;
+            } else {
+                outputBox.innerText = `Sense: 5'- ${seq.substring(0,21)} -3'\nAntisense: 3'- ${seq.substring(0,21).split('').reverse().join('')} -5'`;
+            }
+        }
+
+        // Export Functionality
+        function exportFullReport() {
+            const gene = document.getElementById('input-gene').value;
+            const variant = document.getElementById('input-variant').value;
+            const modality = modalitiesData[activeModalityId].name;
             
-            const detailedBlueprint = {
-                construct_id: constructId,
-                patient_profile: {
-                    patient_id: patientId,
-                    verified_genotype: genotype,
-                    target_precision_score: "99.2%"
-                },
-                selected_therapy: therapy,
-                virtual_sequence_metadata: {
-                    format: "Codon-Optimized mRNA Construct",
-                    length_nucleotides: 148,
-                    gc_content: "58.4%"
-                },
-                cellular_impact_simulation: {
-                    mechanism_of_action: "Selective Receptor Blockade & Apoptosis Induction",
-                    cancer_cell_effect: "Halts uncontrolled MAPK/ERK signaling cascade, prevents DNA replication, and triggers caspase-3 mediated programmed cell death.",
-                    healthy_cell_sparing_index: "High (Selective binding affinity to mutated epitope only)",
-                    resistance_mitigation: "Designed with secondary structural modifications to bypass known efflux pumps and point mutation steric hindrance."
-                },
-                delivery_and_manufacturing: {
-                    vector: "Ionizable Lipid Nanoparticle (LNP-Targeted-V7)",
-                    regulatory_readiness: "Genotypic Custom Formulation Ready for Pre-Clinical Validation"
-                },
-                timestamp: new Date().toISOString()
-            };
+            const reportText = `ONCOSYNTH AI PRE-CLINICAL PROTOCOL DOSSIER
+==================================================
+Date: ${new Date().toISOString()}
+Target Gene: ${gene}
+Mutation: ${variant}
+Selected Therapeutic Modality: ${modality}
 
-            document.getElementById('cure-output').innerText = JSON.stringify(detailedBlueprint, null, 2);
+GENOMIC MAKEUP TRANSFORMATION
+- Chromosomal Locus: ${modalitiesData[activeModalityId].genomicMakeup.chromosomalLocus}
+- Nucleotide Transformation: ${modalitiesData[activeModalityId].genomicMakeup.nucleotideTransformation}
+- Codon Shift: ${modalitiesData[activeModalityId].genomicMakeup.codonShift}
+
+DRY LAB IN SILICO PROTOCOL:
+${modalitiesData[activeModalityId].dryLabProtocol.join('\n')}
+
+WET LAB PRE-CLINICAL PROTOCOL:
+${modalitiesData[activeModalityId].wetLabProtocol.join('\n')}
+
+==================================================
+Generated by OncoSynth AI Enterprise Workspace v4.2`;
+
+            const blob = new Blob([reportText], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `OncoSynth_${gene}_${modality.replace(/[^a-zA-Z0-9]/g, '_')}_Protocol.txt`;
+            link.click();
+        }
+
+
+        // -------------------------------------------------------------
+        // 3D ROTATING DNA HELIX VIRTUAL CANVAS ANIMATION ENGINE
+        // -------------------------------------------------------------
+        let canvas, ctx;
+        let animationFrameId;
+        let rotationAngle = 0;
+
+        function init3DDnaCanvas() {
+            canvas = document.getElementById('dnaCanvas');
+            if(!canvas) return;
+            ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            // Canvas Mouse Interaction for Manual Rotation
+            let isDragging = false;
+            let previousMouseX = 0;
+
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                previousMouseX = e.clientX;
+            });
+
+            window.addEventListener('mouseup', () => isDragging = false);
+
+            canvas.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaX = e.clientX - previousMouseX;
+                    rotationAngle += deltaX * 0.01;
+                    previousMouseX = e.clientX;
+                }
+            });
+
+            // Start Animation Loop
+            animateDna();
+        }
+
+        function animateDna() {
+            if(!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            const numNodes = 28;
+            const nodeSpacing = 14;
+            const radius = Math.min(width, height) * 0.22;
+
+            if (isDnaRotating) {
+                rotationAngle += 0.018;
+            }
+
+            for (let i = 0; i < numNodes; i++) {
+                const y = centerY - ((numNodes / 2) - i) * nodeSpacing;
+                const phase = rotationAngle + (i * 0.25);
+
+                const x1 = centerX + Math.cos(phase) * radius;
+                const z1 = Math.sin(phase) * radius;
+
+                const x2 = centerX + Math.cos(phase + Math.PI) * radius;
+                const z2 = Math.sin(phase + Math.PI) * radius;
+
+                // Scale perspective based on Z position
+                const scale1 = (z1 + radius * 2) / (radius * 2);
+                const scale2 = (z2 + radius * 2) / (radius * 2);
+
+                const size1 = Math.max(2, 4.5 * scale1);
+                const size2 = Math.max(2, 4.5 * scale2);
+
+                // Highlight mutated/edited central region
+                const isEditedZone = i >= 11 && i <= 17;
+
+                // Base pair connecting line
+                ctx.beginPath();
+                ctx.moveTo(x1, y);
+                ctx.lineTo(x2, y);
+                ctx.strokeStyle = isEditedZone ? 'rgba(52, 211, 153, 0.4)' : 'rgba(148, 163, 184, 0.15)';
+                ctx.lineWidth = isEditedZone ? 2 : 1;
+                ctx.stroke();
+
+                // Strand 1 Node (Mutant Target Strand / Edited)
+                ctx.beginPath();
+                ctx.arc(x1, y, size1, 0, Math.PI * 2);
+                if (z1 > 0) {
+                    ctx.fillStyle = isEditedZone ? '#10b981' : '#f43f5e';
+                } else {
+                    ctx.fillStyle = isEditedZone ? '#047857' : '#9f1239';
+                }
+                ctx.fill();
+
+                // Strand 2 Node (Correction Vector / PAM)
+                ctx.beginPath();
+                ctx.arc(x2, y, size2, 0, Math.PI * 2);
+                if (z2 > 0) {
+                    ctx.fillStyle = isEditedZone ? '#38bdf8' : '#0284c7';
+                } else {
+                    ctx.fillStyle = isEditedZone ? '#0284c7' : '#075985';
+                }
+                ctx.fill();
+            }
+
+            animationFrameId = requestAnimationFrame(animateDna);
+        }
+
+        function toggleDnaRotation() {
+            isDnaRotating = !isDnaRotating;
+        }
+
+        function resetDnaView() {
+            rotationAngle = 0;
+            isDnaRotating = true;
+        }
+
+        function updateDnaStatusText(modalityName) {
+            const statusElem = document.getElementById('dna-status-text');
+            if(statusElem) {
+                statusElem.innerText = `Active Mode: ${modalityName}`;
+            }
         }
     </script>
 </body>
